@@ -60,6 +60,7 @@ def addQuote():
     # INPUTS
     QUOTE = input("Quote: ")
     AUTHOR = input("Author: ")
+    BOOK = input("Where is the quote from?: ")
     # PROCESSING
     if QUOTE == "":
         print("Quote is required!")
@@ -68,12 +69,13 @@ def addQuote():
             INSERT INTO
                 quotes (
                     quote,
-                    author
+                    author,
+                    book
                 )
             VALUES (
-                ?, ?
+                ?, ?, ?
             )
-        ;''', (QUOTE, AUTHOR))
+        ;''', (QUOTE, AUTHOR, BOOK))
         # OUTPUT
         CONNECTION.commit()
         print(f"{QUOTE} was successfully saved to table.")
@@ -114,7 +116,8 @@ def updateQuote(ID):
     QUOTE_INFO = CURSOR.execute('''
         SELECT
             quote,
-            author
+            author,
+            book
         FROM
             quotes
         WHERE
@@ -123,11 +126,12 @@ def updateQuote(ID):
 
     # INPUTS
     print("Leave field blank for no changes")
-    QUOTE = input(f"First Name: ({QUOTE_INFO[0]}) ")
-    AUTHOR = input(f"Last Name: ({QUOTE_INFO[1]}) ")
+    QUOTE = input(f"Quote: ({QUOTE_INFO[0]}) ")
+    AUTHOR = input(f"Author: ({QUOTE_INFO[1]}) ")
+    BOOK = input(f"Where is the book from?: ({QUOTE_INFO[2]}) ")
 
     # PROCESSING
-    INFO = [QUOTE, AUTHOR]
+    INFO = [QUOTE, AUTHOR, BOOK]
     for i in range(len(INFO)):
         if INFO[i] == "":
             INFO[i] = QUOTE_INFO[i]
@@ -140,7 +144,8 @@ def updateQuote(ID):
             quotes
         SET
             quote = ?,
-            author = ?
+            author = ?,
+            book = ?
         WHERE
             id = ?
     ;''', INFO)
@@ -159,7 +164,8 @@ def setup():
             quotes (
                 id INTEGER PRIMARY KEY,
                 quote TEXT NOT NULL,
-                author TEXT
+                author TEXT,
+                book TEXT
             )
     ;''')
     CONNECTION.commit()
@@ -200,7 +206,8 @@ def randomQuote():
     QUOTES = CURSOR.execute('''
         SELECT
             quote,
-            author
+            author,
+            book
         FROM
             quotes
         ORDER BY
@@ -215,13 +222,19 @@ def randomQuote():
     
     QUOTES = list(QUOTES)
 
-    if QUOTES[1] == "":
+    if QUOTES[1] == "" and QUOTES[2] == "":
         print(f"{QUOTES[0]}")
-    else:
+    elif QUOTES[2] == "":
         print(f"""
 {QUOTES[0]}
 
     - {QUOTES[1]}
+        """)
+    else:
+        print(f"""
+{QUOTES[0]}
+
+    - {QUOTES[1]} ({QUOTES[2]})
         """)
 
 ## OUTPUTS
