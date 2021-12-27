@@ -42,11 +42,12 @@ Please select an option:
     1. Get Random Quote
     2. Add Quote
     3. Remove Quote
-    4. Exit
+    4. Update Quote
+    5. Exit
     """)
     CHOICE = input("> ")
     CHOICE = checkInt(CHOICE)
-    if CHOICE > 0 and CHOICE < 5:
+    if CHOICE > 0 and CHOICE < 6:
         return CHOICE
     else:
         print("Please enter a number in the menu!")
@@ -102,6 +103,50 @@ def getQuoteID():
     QUOTE_ID = INFO[ROW_INDEX][0]
     return QUOTE_ID
 
+def updateQuote(ID):
+    """User updates contact information
+
+    Args:
+        ID (int): primary key
+    """
+    global CURSOR, CONNECTION
+
+    QUOTE_INFO = CURSOR.execute('''
+        SELECT
+            quote,
+            author
+        FROM
+            quotes
+        WHERE
+            id = ?
+    ;''', [ID]).fetchone()
+
+    # INPUTS
+    print("Leave field blank for no changes")
+    QUOTE = input(f"First Name: ({QUOTE_INFO[0]}) ")
+    AUTHOR = input(f"Last Name: ({QUOTE_INFO[1]}) ")
+
+    # PROCESSING
+    INFO = [QUOTE, AUTHOR]
+    for i in range(len(INFO)):
+        if INFO[i] == "":
+            INFO[i] = QUOTE_INFO[i]
+
+    INFO.append(ID)
+
+    # OUTPUT
+    CURSOR.execute('''
+        UPDATE
+            quotes
+        SET
+            quote = ?,
+            author = ?
+        WHERE
+            id = ?
+    ;''', INFO)
+
+    CONNECTION.commit()
+    print(f"{INFO[0]} is successfully updated!")
 
 ## PROCESSING
 def setup():
@@ -203,5 +248,8 @@ if __name__ == "__main__":
             QUOTE_ID = getQuoteID()
             deleteQuote(QUOTE_ID)
         elif MENU == 4:
+            QUOTE_ID = getQuoteID()
+            updateQuote(QUOTE_ID)
+        elif MENU == 5:
             print("Goodbye!")
             exit()
