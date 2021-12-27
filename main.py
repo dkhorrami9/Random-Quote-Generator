@@ -6,6 +6,7 @@ Date-created: 2021-12-26
 
 import sqlite3
 import pathlib
+from types import NoneType
 
 # --- VARIABLES --- #
 DATABASE = 'quotes.db'
@@ -44,12 +45,12 @@ Please select an option:
     4. Exit
     """)
     CHOICE = input("> ")
-
-    if int(CHOICE) < 1 and int(CHOICE) > 4:
-        print("Please enter a number in the menu!")
-        CHOICE = input("> ")
+    CHOICE = checkInt(CHOICE)
+    if CHOICE > 0 and CHOICE < 5:
+        return CHOICE
     else:
-        return checkInt(CHOICE)
+        print("Please enter a number in the menu!")
+        return menu()
 
 def addQuote():
     """User inputs quote into quotes table
@@ -163,6 +164,10 @@ def randomQuote():
             1
     ;''').fetchone()
 
+    if QUOTES == None:
+        print("There are no quotes in the database!")
+        return MENU
+    
     QUOTES = list(QUOTES)
 
     if QUOTES[1] == "":
